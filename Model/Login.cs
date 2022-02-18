@@ -5,11 +5,12 @@ namespace Model;
 
 public class Login
 {
-    public static List<int> loggedEmployees;
+    public static int loggedEmployee;
     public static List<Employee> validEmployees;
     public static void fillValidEmployees()
     {
-        loggedEmployees = new List<int>();
+        // -1 when no one is logged
+        loggedEmployee = -1;
         validEmployees = new List<Employee>();
         Employee emp1 = new Employee(1, "example1@test.com", "password", "employee");
         Employee emp2 = new Employee(2, "example2@test.com", "password", "employee");
@@ -27,20 +28,22 @@ public class Login
         {
             if (e.email.Equals(email) && e.password.Equals(password))
             {
-                if (isEmployeeLogged(e.id)) {
+                if (loggedEmployee == e.id)
+                {
                     System.Console.WriteLine("Already logged in!");
                     break;
                 }
                 System.Console.WriteLine("Login successfull");
-                loggedEmployees.Add(e.id);
+                loggedEmployee = e.id;
                 break;
             }
 
         }
-        loggedEmployees.ForEach(Console.WriteLine);
         System.Console.WriteLine("Oops, try again!");
     }
-    public static bool isEmployeeLogged(int id)
+    // Previous logic was for handling multiple session
+    // But it doesn't make sense to be logged with 5 different users =)
+    /* public static bool isEmployeeLogged(int id)
     {
         foreach (int _id in loggedEmployees)
         {
@@ -50,7 +53,7 @@ public class Login
             }
         }
         return false;
-    }
+    } */
     public static bool isManager(int id)
     {
         foreach (Employee e in validEmployees)

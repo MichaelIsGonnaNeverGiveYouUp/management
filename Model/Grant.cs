@@ -26,12 +26,14 @@ public class Grant
     {
         string result = "";
         // If user is not logged and is not a manager, just exit
-        bool islogged = Login.isEmployeeLogged(user_id);
+        bool islogged = user_id == Login.loggedEmployee;
         bool ismanager = Login.isManager(user_id);
-        if (!islogged) {
+        if (!islogged)
+        {
             result += "not authenticated ";
         }
-        if (!ismanager) {
+        if (!ismanager)
+        {
             result += "not manager";
         }
         System.Console.WriteLine($"Result logged: {islogged} - manager: {ismanager}");
@@ -53,13 +55,15 @@ public class Grant
     public static string removePermission(int user_id, int doc_id)
     {
         string result = "";
-        // If user is not logged, just exit
-        bool islogged = Login.isEmployeeLogged(user_id);
+        bool islogged = user_id == Login.loggedEmployee;
         bool ismanager = Login.isManager(user_id);
-        if (!islogged) {
+
+        if (!islogged)
+        {
             result += "not authenticated ";
         }
-        if (!ismanager) {
+        if (!ismanager)
+        {
             result += "not manager";
         }
         if (islogged && ismanager)
@@ -70,14 +74,15 @@ public class Grant
                 if (p.user_id == user_id && p.doc_id == doc_id)
                 {
                     permissionsList.Remove(p);
-                    if (!Grant.isPermissionForUserAdded(p.user_id, p.doc_id)) {
+                    if (!Grant.isPermissionForUserAdded(p.user_id, p.doc_id))
+                    {
                         result = "success";
                     }
                     return result;
                 }
             }
         }
-        
+
         return result;
     }
     public static bool isPermissionForUserAdded(int user_id, int doc_id)
@@ -90,5 +95,40 @@ public class Grant
             }
         }
         return false;
+    }
+    public Response getDocumentsPerUser(int user_id) {
+        Response response = new Response();
+        response.content = "";
+        bool ismanager = Login.isManager(user_id);
+        bool islogged = user_id == Login.loggedEmployee;
+
+        // This is what we will return
+        List<Permissions> newPermissionsList = new List<Permissions>();
+
+        if (!islogged)
+        {
+            response.message += "not authenticated ";
+        }
+        if (!ismanager)
+        {
+            response.message += "not manager";
+        }
+        if (islogged) {
+            
+            if (ismanager) {
+                newPermissionsList = Grant.permissionsList;
+            } else {
+                foreach (Permissions p in permissionsList) {
+                    if (p.user_id == user_id) {
+                        newPermissionsList.Add(p);
+                    }
+                }
+            }
+        }
+        // Serializing the result
+        foreach(Permissions p in newPermissionsList) {
+            response.content += p.serialize();
+        }
+        return response;
     }
 }
