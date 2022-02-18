@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Model;
 
@@ -26,8 +27,8 @@ public class Grant
     {
         string result = "";
         // If user is not logged and is not a manager, just exit
-        bool islogged = user_id == Login.loggedEmployee;
-        bool ismanager = Login.isManager(user_id);
+        bool islogged = Login.loggedEmployee != -1;
+        bool ismanager = Login.isManager(Login.loggedEmployee);
         if (!islogged)
         {
             result += "not authenticated ";
@@ -55,8 +56,8 @@ public class Grant
     public static string removePermission(int user_id, int doc_id)
     {
         string result = "";
-        bool islogged = user_id == Login.loggedEmployee;
-        bool ismanager = Login.isManager(user_id);
+        bool islogged = Login.loggedEmployee != -1;
+        bool ismanager = Login.isManager(Login.loggedEmployee);
 
         if (!islogged)
         {
@@ -99,11 +100,20 @@ public class Grant
         }
         return false;
     }
-    public Response getDocumentsPerUser(int user_id) {
+
+    public static string serializeListOfPermissions(List<Permissions> list)
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        string jsonString = JsonSerializer.Serialize(list, options);
+        return jsonString;
+    }
+
+    public static Response getDocumentsPerUser() {
+        int user_id = Login.loggedEmployee;
         Response response = new Response();
         response.content = "";
-        bool ismanager = Login.isManager(user_id);
-        bool islogged = user_id == Login.loggedEmployee;
+        bool ismanager = Login.isManager(Login.loggedEmployee);
+        bool islogged = Login.loggedEmployee != -1;
 
         // This is what we will return
         List<Permissions> newPermissionsList = new List<Permissions>();
@@ -129,9 +139,7 @@ public class Grant
             }
         }
         // Serializing the result
-        foreach(Permissions p in newPermissionsList) {
-            response.content += p.serialize();
-        }
+        response.content = serializeListOfPermissions(newPermissionsList);
         return response;
     }
 }

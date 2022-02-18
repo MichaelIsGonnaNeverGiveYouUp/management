@@ -12,10 +12,10 @@ public class Login
         // -1 when no one is logged
         loggedEmployee = -1;
         validEmployees = new List<Employee>();
-        Employee emp1 = new Employee(1, "example1@test.com", "password", "employee");
-        Employee emp2 = new Employee(2, "example2@test.com", "password", "employee");
-        Employee emp3 = new Employee(3, "example3@test.com", "password", "employee");
-        Employee emp4 = new Employee(4, "example4@test.com", "password", "manager");
+        Employee emp1 = new Employee(1, "example1@test.com", "AVeryLongLongPasswordWith3Rules!", "employee");
+        Employee emp2 = new Employee(2, "example2@test.com", "AVeryLongLongPasswordWith3Rules!", "employee");
+        Employee emp3 = new Employee(3, "example3@test.com", "AVeryLongLongPasswordWith3Rules!", "employee");
+        Employee emp4 = new Employee(4, "example4@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
         validEmployees.Add(emp1);
         validEmployees.Add(emp2);
         validEmployees.Add(emp3);
