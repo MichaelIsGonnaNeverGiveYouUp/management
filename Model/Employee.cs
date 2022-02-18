@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Model;
 
 public class Employee
@@ -12,5 +14,11 @@ public class Employee
         this.email = email;
         this.password = password;
         this.employee_type = employee_type;
+    }
+    public string serialize()
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        string jsonString = JsonSerializer.Serialize(this, options);
+        return jsonString;
     }
 }

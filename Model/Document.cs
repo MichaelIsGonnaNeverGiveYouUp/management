@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Model;
 
 public class Document
@@ -7,5 +9,11 @@ public class Document
     public Document(int id, string name) {
         this.id = id;
         this.name = name;
+    }
+    public string serialize()
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        string jsonString = JsonSerializer.Serialize(this, options);
+        return jsonString;
     }
 }
