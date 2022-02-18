@@ -81,6 +81,9 @@ public class Grant
                     return result;
                 }
             }
+            if (!result.Equals("success")) {
+                result = "document doesn't exist";
+            }
         }
 
         return result;

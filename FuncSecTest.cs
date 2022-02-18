@@ -78,74 +78,90 @@ public class FuncSecTest
         
     }
 
-    /* [Test]
+    [Test]
     public void VerifyEmployeeCantAdd()
     {
+        Response response;
+
+        // Error - not manager
         Setup();
-
-        // Login before adding
         Employee emp1 = new Employee(1, "example1@test.com", "password", "employee");
-        Employee emp2 = new Employee(2, "example2@test.com", "password", "employee");
-        Employee emp4 = new Employee(4, "example4@test.com", "password", "manager");
-
-        ApiJson("https://api.example.com/login", emp1.serialize());
-        ApiJson("https://api.example.com/login", emp2.serialize());
-        ApiJson("https://api.example.com/login", emp4.serialize());
-
-
-        // This next 2 should fail
         Permissions permissions11 = new Permissions(1, 1);
-        Permissions permissions22 = new Permissions(2, 2);
-
-        // This should be ok
-        Permissions permissions41 = new Permissions(4, 1);
-
-        Response response = ApiJson("https://api.example.com/accesses/add", permissions11.serialize());
+        ApiJson("https://api.example.com/login", emp1.serialize());
+        response = ApiJson("https://api.example.com/accesses/add", permissions11.serialize());
         Assert.AreEqual("not manager", response.message);
 
+        // Error - not manager
+        Setup();
+        Employee emp2 = new Employee(2, "example2@test.com", "password", "employee");
+        Permissions permissions22 = new Permissions(2, 2);
+        ApiJson("https://api.example.com/login", emp2.serialize());
         response = ApiJson("https://api.example.com/accesses/add", permissions22.serialize());
         Assert.AreEqual("not manager", response.message);
 
+        // Success
+        Setup();
+        Employee emp4 = new Employee(4, "example4@test.com", "password", "manager");
+        Permissions permissions41 = new Permissions(4, 1);
+        ApiJson("https://api.example.com/login", emp4.serialize());
         response = ApiJson("https://api.example.com/accesses/add", permissions41.serialize());
         Assert.AreEqual("success", response.message);
+
+        // Error - not authenticated not manager. Because user doesn't exist
+        Setup();
+        Employee emp5 = new Employee(5, "example5@test.com", "password", "employee");
+        Permissions permissions55 = new Permissions(5, 5);
+        response = ApiJson("https://api.example.com/accesses/add", permissions55.serialize());
+        Assert.AreEqual("not authenticated not manager", response.message);
     }
 
     [Test]
     public void VerifyEmployeeCantRemove()
     {
+        Response response;
+
+        // Error - not manager
         Setup();
-
-        // Login before removing
         Employee emp1 = new Employee(1, "example1@test.com", "password", "employee");
-        Employee emp2 = new Employee(2, "example2@test.com", "password", "employee");
-        Employee emp4 = new Employee(4, "example4@test.com", "password", "manager");
-
-        ApiJson("https://api.example.com/login", emp1.serialize());
-        ApiJson("https://api.example.com/login", emp2.serialize());
-        ApiJson("https://api.example.com/login", emp4.serialize());
-
-
-        // Expecting error
         Permissions permissions11 = new Permissions(1, 1);
-        Permissions permissions33 = new Permissions(3, 3);
-        // This should work
-        Permissions permissions41 = new Permissions(4, 1);
-
-        // Adding permission
-        Response response = ApiJson("https://api.example.com/accesses/add", permissions41.serialize());
-
-        // Trying to remove permission with no manager user
+        ApiJson("https://api.example.com/login", emp1.serialize());
         response = ApiJson("https://api.example.com/accesses/remove", permissions11.serialize());
         Assert.AreEqual("not manager", response.message);
 
-        // Trying to remove permission with no authenticated and no manager user
-        response = ApiJson("https://api.example.com/accesses/remove", permissions33.serialize());
-        Assert.AreEqual("not authenticated not manager", response.message);
+        // Error - not manager
+        Setup();
+        Employee emp2 = new Employee(2, "example2@test.com", "password", "employee");
+        Permissions permissions22 = new Permissions(2, 2);
+        ApiJson("https://api.example.com/login", emp2.serialize());
+        response = ApiJson("https://api.example.com/accesses/remove", permissions22.serialize());
+        Assert.AreEqual("not manager", response.message);
 
-        // Removing permission
+        // Success
+        Setup();
+        Employee emp4 = new Employee(4, "example4@test.com", "password", "manager");
+        Permissions permissions41 = new Permissions(4, 1);
+        ApiJson("https://api.example.com/login", emp4.serialize());
+        // Adding a document to remove it later
+        response = ApiJson("https://api.example.com/accesses/add", permissions41.serialize());
         response = ApiJson("https://api.example.com/accesses/remove", permissions41.serialize());
         Assert.AreEqual("success", response.message);
-    } */
+
+        // Document doesn't exist
+        Setup();
+        emp4 = new Employee(4, "example4@test.com", "password", "manager");
+        permissions41 = new Permissions(4, 1);
+        ApiJson("https://api.example.com/login", emp4.serialize());
+        // We just try to remove something that doesn't exist
+        response = ApiJson("https://api.example.com/accesses/remove", permissions41.serialize());
+        Assert.AreEqual("document doesn't exist", response.message);
+
+        // Error - not authenticated not manager. Because user doesn't exist
+        Setup();
+        Employee emp5 = new Employee(5, "example5@test.com", "password", "employee");
+        Permissions permissions55 = new Permissions(5, 5);
+        response = ApiJson("https://api.example.com/accesses/remove", permissions55.serialize());
+        Assert.AreEqual("not authenticated not manager", response.message);
+    }
 
     /* [Test]
     public void VerifyListOfDocuments()
