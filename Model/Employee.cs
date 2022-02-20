@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Ganss.XSS;
 
 namespace Model;
 
@@ -15,6 +16,7 @@ public class Employee
         this.password = password;
         this.employee_type = employee_type;
     }
+
     public string serialize()
     {
         var options = new JsonSerializerOptions { WriteIndented = true };

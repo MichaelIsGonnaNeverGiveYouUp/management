@@ -11,6 +11,7 @@ public class FuncSecTest
     public static Response ApiJson(string endpointName, string inputJson="")
     {
         Response response = new Response();
+        response.headers["Strict-Transport-Security"] = "";
         string message = "error";
         if (endpointName.Equals("https://api.example.com/login"))
         {
