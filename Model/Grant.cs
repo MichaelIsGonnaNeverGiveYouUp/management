@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Web;
 
 namespace Model;
 
@@ -37,13 +38,13 @@ public class Grant
         {
             result += "not manager";
         }
-        System.Console.WriteLine($"Result logged: {islogged} - manager: {ismanager}");
+        //System.Console.WriteLine($"Result logged: {islogged} - manager: {ismanager}");
         if (islogged && ismanager)
         {
             // First, we check if permission has been added so it's not duplicated
             if (!isPermissionForUserAdded(user_id, doc_id))
             {
-                System.Console.WriteLine("Added");
+                //System.Console.WriteLine("Added");
                 permissionsList.Add(new Permissions(user_id, doc_id));
             }
             // Only return success if the permission has been added
@@ -108,9 +109,60 @@ public class Grant
         return jsonString;
     }
 
-    public static Response getDocumentsPerUser() {
+    public static Response GetDocumentById(Response response) {
+        
+        Console.WriteLine($"Downloading document {response.request_url}");
+
+        var uri = new Uri(response.request_url);
+        var query = HttpUtility.ParseQueryString(uri.Query);
+        var id = Int64.Parse(query.Get("id"));
+
         int user_id = Login.loggedEmployee;
-        Response response = new Response();
+        response.content = "";
+        bool ismanager = Login.isManager(Login.loggedEmployee);
+        bool islogged = Login.loggedEmployee != -1;
+
+        // This is what we will return
+        List<Permissions> newPermissionsList = new List<Permissions>();
+
+        if (!islogged)
+        {
+            response.message += "not authenticated ";
+        }
+        if (!ismanager)
+        {
+            response.message += "not manager";
+        }
+        
+        if (islogged) {
+            
+            if (ismanager) {
+                foreach (Permissions p in permissionsList) {
+                    if (id == p.doc_id) {
+                        Console.WriteLine($"Downloading document {id} as manager");
+                        response.content = $"Downloading document {id}";
+                        return response;
+                    }
+                }
+            } else {
+                foreach (Permissions p in permissionsList) {
+                    if (p.user_id == user_id && id == p.doc_id) {
+                        Console.WriteLine($"Downloading document {id} as user");
+                        response.content = $"Downloading document {id}";
+                        return response;
+                    }
+                }
+            }
+        }
+        if (response.content.Equals("")) {
+            response.content = "Document doesn't exist";
+        }
+        Console.WriteLine(response);
+        return response;
+    }
+
+    public static Response getDocumentsPerUser(Response response) {
+        int user_id = Login.loggedEmployee;
         response.content = "";
         bool ismanager = Login.isManager(Login.loggedEmployee);
         bool islogged = Login.loggedEmployee != -1;

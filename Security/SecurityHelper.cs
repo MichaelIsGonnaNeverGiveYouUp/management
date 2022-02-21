@@ -6,6 +6,10 @@ namespace Security;
 
 public class SecurityHelper
 {
+    public static Response SecureResponse(Response response) {
+        response = ApplyHSTS(response);
+        return response;
+    }
     public static Response ApplyHSTS(Response response) {
         if (response.headers.ContainsKey("Strict-Transport-Security")) {
             // We do the change to https if starts with http

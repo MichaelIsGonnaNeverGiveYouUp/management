@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using Model;
+using Security;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
@@ -11,9 +13,13 @@ public class FuncSecTest
     public static Response ApiJson(string endpointName, string inputJson="")
     {
         Response response = new Response();
-        response.headers["Strict-Transport-Security"] = "";
+        response.headers = new Dictionary<string, string>();
+        response.headers["Strict-Transport-Security"] = "max-age=3153600;";
+        response.request_url = endpointName;
+
+        response = SecurityHelper.SecureResponse(response);
         string message = "error";
-        if (endpointName.Equals("https://api.example.com/login"))
+        if (endpointName.EndsWith("api.example.com/login"))
         {
             Employee? employee = JsonSerializer.Deserialize<Employee>(inputJson);
             Login.login(employee.email, employee.password);
@@ -22,24 +28,28 @@ public class FuncSecTest
                 message = "success";
             }
         }
-        else if (endpointName.Equals("https://api.example.com/accesses/add"))
+        else if (endpointName.EndsWith("api.example.com/accesses/add"))
         {
+            Console.WriteLine("Adding");
             Permissions? permissions = JsonSerializer.Deserialize<Permissions>(inputJson);
             message = Grant.addPermission(permissions.user_id, permissions.doc_id);
         }
-        else if (endpointName.Equals("https://api.example.com/accesses/remove"))
+        else if (endpointName.EndsWith("api.example.com/accesses/remove"))
         {
+            Console.WriteLine("Removing");
             Permissions? permissions = JsonSerializer.Deserialize<Permissions>(inputJson);
             message = Grant.removePermission(permissions.user_id, permissions.doc_id);
         }
-        else if (endpointName.Equals("https://api.example.com/docs"))
+        else if (endpointName.EndsWith("api.example.com/docs"))
         {
-            response = Grant.getDocumentsPerUser();
-            return response;
+            Console.WriteLine("Docs");
+            response = Grant.getDocumentsPerUser(response);
+            //return response;
         }
-        else if (endpointName.Equals("https://api.example.com/download?id=1"))
+        else if (endpointName.Contains("api.example.com/docs/download?id="))
         {
-
+            Console.WriteLine("Downloading id");
+            response = Grant.GetDocumentById(response);
         }
         response.message = message;
         return response;
@@ -259,5 +269,70 @@ public class FuncSecTest
         response = ApiJson("https://api.example.com/docs");
         response = ApiJson("https://api.example.com/accesses/remove", permissions11.serialize());
         Assert.AreEqual(null, response.content);
+    }
+
+    [Test]
+    public void VerifyHttpNowAllowed()
+    {
+        Setup();
+        Response response;
+
+        // Success
+        Setup();
+        Employee emp1 = new Employee(1, "example1@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
+        Employee emp2 = new Employee(2, "example2@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
+        Employee emp4 = new Employee(4, "example4@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
+        Permissions permissions11 = new Permissions(1, 1);
+        Permissions permissions12 = new Permissions(1, 2);
+        Permissions permissions13 = new Permissions(1, 3);
+
+        // Check if HSTS works as expected for login
+        response = ApiJson("http://api.example.com/login", emp4.serialize());
+        Assert.AreEqual("https://api.example.com/login", response.request_url);
+
+        // Check if HSTS works as expected for adding
+        response = ApiJson("http://api.example.com/accesses/add", permissions11.serialize());
+        Assert.AreEqual("https://api.example.com/accesses/add", response.request_url);
+
+        // Check if HSTS works as expected for removing
+        response = ApiJson("http://api.example.com/accesses/remove", permissions11.serialize());
+        Assert.AreEqual("https://api.example.com/accesses/remove", response.request_url);
+        
+        // Check if HSTS works as expected for listing
+        response = ApiJson("http://api.example.com/docs");
+        Assert.AreEqual("https://api.example.com/docs", response.request_url);
+        
+    }
+
+    [Test]
+    public void VerifyDownloadDocument()
+    {
+        Setup();
+        Response response;
+
+        // Success
+        Setup();
+        Employee emp1 = new Employee(1, "example1@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
+        Employee emp2 = new Employee(2, "example2@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
+        Employee emp4 = new Employee(4, "example4@test.com", "AVeryLongLongPasswordWith3Rules!", "manager");
+        Permissions permissions11 = new Permissions(1, 1);
+        Permissions permissions12 = new Permissions(1, 2);
+        Permissions permissions13 = new Permissions(1, 3);
+
+        ApiJson("http://api.example.com/login", emp4.serialize());
+        ApiJson("http://api.example.com/accesses/add", permissions11.serialize());
+        ApiJson("http://api.example.com/accesses/add", permissions12.serialize());
+        ApiJson("http://api.example.com/accesses/add", permissions13.serialize());
+
+        response = ApiJson("https://api.example.com/docs/download?id=1");
+        System.Console.WriteLine(response);
+        Assert.AreEqual("Downloading document 1", response.content);
+        response = ApiJson("https://api.example.com/docs/download?id=2");
+        Assert.AreEqual("Downloading document 2", response.content);
+        response = ApiJson("https://api.example.com/docs/download?id=3");
+        Assert.AreEqual("Downloading document 3", response.content);
+        response = ApiJson("https://api.example.com/docs/download?id=4");
+        Assert.AreEqual("Document doesn't exist", response.content);
+        
     }
 }

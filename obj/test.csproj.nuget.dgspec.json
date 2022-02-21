@@ -38,10 +38,6 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
-            "HtmlSanitizer": {
-              "target": "Package",
-              "version": "[7.1.475, )"
-            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[16.11.0, )"
@@ -53,10 +49,6 @@
             "NUnit3TestAdapter": {
               "target": "Package",
               "version": "[4.0.0, )"
-            },
-            "RestSharp": {
-              "target": "Package",
-              "version": "[107.3.0, )"
             },
             "coverlet.collector": {
               "target": "Package",

@@ -26,7 +26,6 @@
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/Newtonsoft.Json.dll
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/NuGet.Frameworks.dll
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/nunit.framework.dll
-/Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/RestSharp.dll
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/cs/Microsoft.TestPlatform.CoreUtilities.resources.dll
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/de/Microsoft.TestPlatform.CoreUtilities.resources.dll
@@ -97,6 +96,3 @@
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/obj/Debug/net6.0/ref/test.dll
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/obj/Debug/net6.0/test.pdb
 /Users/michaelbecerra/Desktop/Codigo/dotnet/test/obj/Debug/net6.0/test.genruntimeconfig.cache
-/Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/AngleSharp.dll
-/Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/AngleSharp.Css.dll
-/Users/michaelbecerra/Desktop/Codigo/dotnet/test/bin/Debug/net6.0/HtmlSanitizer.dll
